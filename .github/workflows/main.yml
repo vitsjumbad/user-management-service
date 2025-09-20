@@ -1,41 +1,50 @@
-name: CI/CD for User Management Service
+name: Deploy User Management Service
 
 on:
   push:
-    branches: [ "main" ]
+    branches:
+      - main   # Run this when you push to main branch
 
 jobs:
-  build:
+  build-deploy:
     runs-on: ubuntu-latest
 
     steps:
+      # 1. Checkout repo
       - name: Checkout code
         uses: actions/checkout@v3
 
+      # 2. Set up Java
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
 
+      # 3. Build the JAR
       - name: Build with Maven
         run: mvn clean package -DskipTests
 
-      - name: Upload JAR to Server
+      # 4. Copy JAR to EC2
+      - name: Upload JAR to EC2
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
-          source: "target/*.jar"
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
+          source: "target/user-management-service-0.0.1-SNAPSHOT.jar"
           target: "/home/ubuntu/"
 
-      - name: Restart Service on Server
+      # 5. Restart service on EC2
+      - name: Restart service on server
         uses: appleboy/ssh-action@v0.1.7
         with:
-          host: ${{ secrets.EC2_HOST }}
-          username: ubuntu
-          key: ${{ secrets.EC2_SSH_KEY }}
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
-            pkill -f "user-management-service" || true
-            nohup java -jar /home/ubuntu/user-management-service-0.0.1-SNAPSHOT.jar --server.port=8081 > app.log 2>&1 &
+            echo "Stopping old service..."
+            pkill -f 'user-management-service-0.0.1-SNAPSHOT.jar' || true
+            echo "Starting new service..."
+            nohup java -jar /home/ubuntu/user-management-service-0.0.1-SNAPSHOT.jar > /home/ubuntu/app.log 2>&1 &
+            echo "Service restarted successfully"
