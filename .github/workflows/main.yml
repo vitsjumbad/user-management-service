@@ -47,6 +47,6 @@ jobs:
           username: ubuntu
           key: ${{ secrets.SSH_KEY }}
           script: |
-            docker pull ${{ secrets.DOCKER_REPO }}:latest
-            docker rm -f user-mgmt-container || true
-            docker run -d --name user-mgmt-container -p 8081:8081 ${{ secrets.DOCKER_REPO }}:latest
+            sudo docker pull ${{ secrets.DOCKER_REPO }}:latest
+            sudo docker rm -f user-mgmt-container || true
+            sudo docker run -d --name user-mgmt-container -p 8081:8081 ${{ secrets.DOCKER_REPO }}:latest
