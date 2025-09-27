@@ -51,10 +51,14 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
       - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA} .
+        run: |
+           docker build -t ${{ secrets.DOCKER_REPO }}:latest .
+           docker build -t ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA} .
 
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
+        run: |
+           docker push ${{ secrets.DOCKER_REPO }}:latest
+           docker push ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
 
   # 3️⃣ Deploy to EC2 (only on main)
   deploy:
@@ -71,5 +75,5 @@ jobs:
           script: |
             docker stop user-mgmt-container || true
             docker rm user-mgmt-container || true
-            docker pull ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
+            docker pull ${{ secrets.DOCKER_REPO }}:latest
             docker run -d --name user-mgmt-container -p 8081:8081 ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
