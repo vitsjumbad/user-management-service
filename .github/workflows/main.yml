@@ -64,12 +64,11 @@ jobs:
       - name: Build Docker image
         run: |
            docker build -t ${{ secrets.DOCKER_REPO }}:${{ env.TAG }} .
-           docker build -t ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA} .
-
+           
       - name: Push Docker image
         run: |
            docker push ${{ secrets.DOCKER_REPO }}:${{ env.TAG }}
-           docker push ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
+           
 
   # 3️⃣ Deploy to EC2 (only on main)
   deploy:
