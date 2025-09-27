@@ -76,4 +76,4 @@ jobs:
             docker stop user-mgmt-container || true
             docker rm user-mgmt-container || true
             docker pull ${{ secrets.DOCKER_REPO }}:latest
-            docker run -d --name user-mgmt-container -p 8081:8081 ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
+            docker run -d --name user-mgmt-container -p 8081:8081 ${{ secrets.DOCKER_REPO }}:latest
