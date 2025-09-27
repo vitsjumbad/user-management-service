@@ -7,6 +7,7 @@ on:
     branches: [ "main", "dev", "staging" ]
 
 jobs:
+  # 1️⃣ Build JAR with Maven
   build:
     runs-on: ubuntu-latest
     steps:
@@ -28,6 +29,7 @@ jobs:
           name: app-jar
           path: target/user-management-service-0.0.1-SNAPSHOT.jar
 
+  # 2️⃣ Build & Push Docker image (only on staging & main)
   docker:
     needs: build
     runs-on: ubuntu-latest
@@ -54,6 +56,7 @@ jobs:
       - name: Push Docker image
         run: docker push ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
 
+  # 3️⃣ Deploy to EC2 (only on main)
   deploy:
     needs: docker
     runs-on: ubuntu-latest
