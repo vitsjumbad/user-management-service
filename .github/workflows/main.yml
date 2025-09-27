@@ -50,14 +50,25 @@ jobs:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
 
+      - name: Set Docker tag
+        id: vars
+        run: |
+          if [[ "${GITHUB_REF}" == "refs/heads/main" ]]; then
+            echo "TAG=latest" >> $GITHUB_ENV
+          elif [[ "${GITHUB_REF}" == "refs/heads/staging" ]]; then
+            echo "TAG=staging" >> $GITHUB_ENV
+          else
+            echo "TAG=${GITHUB_SHA}" >> $GITHUB_ENV
+          fi
+          
       - name: Build Docker image
         run: |
-           docker build -t ${{ secrets.DOCKER_REPO }}:latest .
+           docker build -t ${{ secrets.DOCKER_REPO }}:${{ env.TAG }} .
            docker build -t ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA} .
 
       - name: Push Docker image
         run: |
-           docker push ${{ secrets.DOCKER_REPO }}:latest
+           docker push ${{ secrets.DOCKER_REPO }}:${{ env.TAG }}
            docker push ${{ secrets.DOCKER_REPO }}:${GITHUB_SHA}
 
   # 3️⃣ Deploy to EC2 (only on main)
