@@ -7,8 +7,26 @@ on:
     branches: [ "main", "dev", "staging" ]
 
 jobs:
+  # 1️⃣ Run Tests
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up JDK
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+
+      - name: Run Maven tests
+        run: mvn clean test
+
+
   # 1️⃣ Build JAR with Maven
   build:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout source
