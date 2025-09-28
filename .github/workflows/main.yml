@@ -86,4 +86,9 @@ jobs:
             docker stop user-mgmt-container || true
             docker rm user-mgmt-container || true
             docker pull ${{ secrets.DOCKER_REPO }}:latest
-            docker run -d --name user-mgmt-container -p 8081:8081 ${{ secrets.DOCKER_REPO }}:latest
+            docker run -d \
+            --name user-mgmt-container \
+            -p 8081:8081 \
+            -e DB_URL=${{ github.ref == 'refs/heads/main' && secrets.PROD_DB_URL || secrets.STAGING_DB_URL }} \
+            -e API_KEY=${{ github.ref == 'refs/heads/main' && secrets.PROD_API_KEY || secrets.STAGING_API_KEY }} \
+            ${{ secrets.DOCKER_REPO }}:latest
