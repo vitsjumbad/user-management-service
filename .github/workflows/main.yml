@@ -117,5 +117,6 @@ jobs:
              -e SPRING_PROFILES_ACTIVE=${{ github.ref == 'refs/heads/main' && 'prod' || 'staging' }} \
              -e DB_URL=${{ github.ref == 'refs/heads/main' && secrets.PROD_DB_URL || secrets.STAGING_DB_URL }} \
              -e API_KEY=${{ github.ref == 'refs/heads/main' && secrets.PROD_API_KEY || secrets.STAGING_API_KEY }} \
+             -e JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport" \
              ${{ secrets.DOCKER_REPO }}:latest
 
