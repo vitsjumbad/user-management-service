@@ -119,4 +119,13 @@ jobs:
              -e API_KEY=${{ github.ref == 'refs/heads/main' && secrets.PROD_API_KEY || secrets.STAGING_API_KEY }} \
              -e JAVA_TOOL_OPTIONS="-XX:-UseContainerSupport" \
              ${{ secrets.DOCKER_REPO }}:latest
-
+      - name: Configure CloudWatch Agent
+        uses: appleboy/ssh-action@v1.2.1
+        with:
+              host: ${{ secrets.EC2_HOST }}
+              username: ubuntu
+              key: ${{ secrets.SSH_KEY }}
+              script: |
+                   sudo /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl \
+                   -a fetch-config -m ec2 -c file:/opt/aws/amazon-cloudwatch-agent/cw-agent-config.json -s
+      
